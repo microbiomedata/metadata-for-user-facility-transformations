@@ -78,7 +78,7 @@
     },
     "Collection Month*": {
         "1": "Month in which the sample was collected. Use the full name of the month.",
-        "sub_port_mapping": "collection_month"
+        "sub_port_mapping": "collection_month_name"
     },
     "Collection Day*": {
         "1": "Day on which the sample was collected.",

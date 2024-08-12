@@ -74,15 +74,15 @@
     },
     "Collection Year*": {
         "1": "Year in which the sample was collected. ",
-        "sub_port_mapping": "collection_date"
+        "sub_port_mapping": "collection_year"
     },
     "Collection Month*": {
         "1": "Month in which the sample was collected. Use the full name of the month.",
-        "sub_port_mapping": "collection_date"
+        "sub_port_mapping": "collection_month_name"
     },
     "Collection Day*": {
         "1": "Day on which the sample was collected.",
-        "sub_port_mapping": "collection_date"
+        "sub_port_mapping": "collection_day"
     },
     "Sample Isolated From*": {
         "1": "Describe where the sample originated.",
