@@ -1,3 +1,4 @@
+import calendar
 import os
 import json
 
@@ -40,14 +41,6 @@ class MetadataRetriever:
             os.environ[key] = value
 
         self.env: Dict[str, str] = dict(os.environ)
-        # self.debug_env_vars()
-
-    def debug_env_vars(self):
-        """Prints the current environment variables for debugging purposes."""
-        print(f"DATA_PORTAL_REFRESH_TOKEN: {self.env.get('DATA_PORTAL_REFRESH_TOKEN')}")
-        print(
-            f"SUBMISSION_PORTAL_BASE_URL: {self.env.get('SUBMISSION_PORTAL_BASE_URL')}"
-        )
 
     def retrieve_metadata_records(self, unique_field: str) -> pd.DataFrame:
         """
@@ -84,6 +77,11 @@ class MetadataRetriever:
             sample_data_df: pd.DataFrame = pd.DataFrame(sample_data)
         else:
             sample_data_df = pd.DataFrame()
+
+        for column in sample_data_df.columns:
+            sample_data_df[column] = sample_data_df[column].apply(
+                lambda x: "; ".join(x) if isinstance(x, list) else x
+            )
 
         common_df: pd.DataFrame = pd.DataFrame()
         if self.user_facility in self.USER_FACILITY_DICT:
@@ -125,6 +123,10 @@ class MetadataRetriever:
             df["collection_year"] = df["collection_date"].str.split("-").str[0]
             df["collection_month"] = df["collection_date"].str.split("-").str[1]
             df["collection_day"] = df["collection_date"].str.split("-").str[2]
+
+            df["collection_month_name"] = df["collection_month"].apply(
+                lambda x: calendar.month_name[int(x)]
+            )
 
         return df
 
