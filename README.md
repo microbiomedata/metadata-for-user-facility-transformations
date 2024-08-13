@@ -62,13 +62,14 @@ Options:
   -h, --header / --no-header  [default: no-header]
   -u, --user-facility TEXT    User facility to send data to.  [required]
   -s, --submission TEXT       Metadata submission id.  [required]
+  -?, --unique-field TEXT     The unique identifier for the submission being transformed.
   --help                      Show this message and exit.
 ```
 - Example- JGI
 ```
-poetry run python etl.py --submission {UUID of the target submission} --user-facility jgi_mg --mapper input-files/jgi_mg_header.json --output file-name_jgi.xlsx
+poetry run python etl.py --submission {UUID of the target submission} --unique_field samp_name --user-facility jgi_mg --mapper input-files/jgi_mg_header.json --output file-name_jgi.xlsx
 ```
 - Example- EMSL
 ```
-poetry run python etl.py --submission df1d2ba5-33be-43d0-b4b9-e5d57ace3f70 --user-facility emsl --mapper input-files/emsl_header.json --output file-name_emsl.xlsx 
+poetry run python etl.py --submission {UUID of the target submission} --unique_field samp_name --user-facility emsl --mapper input-files/emsl_header.json --output file-name_emsl.xlsx 
 ```
