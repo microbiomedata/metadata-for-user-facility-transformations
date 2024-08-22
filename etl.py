@@ -1,3 +1,4 @@
+import calendar
 import os
 import json
 
@@ -5,8 +6,8 @@ import pandas as pd
 import click
 import requests
 
-from typing import Dict, Any, List, Union, Optional
-from dotenv import load_dotenv
+from typing import Dict, Any, List, Union
+from dotenv import load_dotenv, dotenv_values
 
 
 class MetadataRetriever:
@@ -29,6 +30,16 @@ class MetadataRetriever:
         """
         self.metadata_submission_id = metadata_submission_id
         self.user_facility = user_facility
+        self.load_and_set_env_vars()
+        self.base_url = self.env.get("SUBMISSION_PORTAL_BASE_URL")
+
+    def load_and_set_env_vars(self):
+        """Loads and sets environment variables from .env file."""
+        env_path = os.path.join(os.path.dirname(__file__), ".env")
+        env_vars = dotenv_values(env_path)
+        for key, value in env_vars.items():
+            os.environ[key] = value
+
         self.env: Dict[str, str] = dict(os.environ)
 
     def retrieve_metadata_records(self, unique_field: str) -> pd.DataFrame:
@@ -37,8 +48,10 @@ class MetadataRetriever:
 
         :return: The retrieved metadata records as a Pandas DataFrame.
         """
+        self.load_and_set_env_vars()
+
         refresh_response = requests.post(
-            "https://data-dev.microbiomedata.org/auth/refresh",
+            f"{self.base_url}/auth/refresh",
             json={"refresh_token": self.env["DATA_PORTAL_REFRESH_TOKEN"]},
         )
         refresh_response.raise_for_status()
@@ -50,17 +63,25 @@ class MetadataRetriever:
             "Authorization": f"Bearer {access_token}",
         }
         response: Dict[str, Any] = requests.get(
-            f"https://data-dev.microbiomedata.org/api/metadata_submission/{self.metadata_submission_id}",
+            f"{self.base_url}/api/metadata_submission/{self.metadata_submission_id}",
             headers=headers,
         ).json()
 
-        if "soil_data" in response["metadata_submission"]["sampleData"]:
-            soil_data: List[Dict[str, Any]] = response["metadata_submission"][
+        sample_data_key = next(
+            iter(response["metadata_submission"]["sampleData"]), None
+        )
+        if sample_data_key:
+            sample_data: List[Dict[str, Any]] = response["metadata_submission"][
                 "sampleData"
-            ]["soil_data"]
-            soil_data_df: pd.DataFrame = pd.DataFrame(soil_data)
+            ][sample_data_key]
+            sample_data_df: pd.DataFrame = pd.DataFrame(sample_data)
         else:
-            soil_data_df = pd.DataFrame()
+            sample_data_df = pd.DataFrame()
+
+        for column in sample_data_df.columns:
+            sample_data_df[column] = sample_data_df[column].apply(
+                lambda x: "; ".join(x) if isinstance(x, list) else x
+            )
 
         common_df: pd.DataFrame = pd.DataFrame()
         if self.user_facility in self.USER_FACILITY_DICT:
@@ -69,22 +90,42 @@ class MetadataRetriever:
             ].get(self.USER_FACILITY_DICT[self.user_facility], {})
             common_df = pd.DataFrame(user_facility_data)
 
-        if soil_data_df.empty and not common_df.empty:
+        if sample_data_df.empty and not common_df.empty:
             df = common_df
-        elif common_df.empty and not soil_data_df.empty:
-            df = soil_data_df
-        elif not common_df.empty and not soil_data_df.empty:
+        elif common_df.empty and not sample_data_df.empty:
+            df = sample_data_df
+        elif not common_df.empty and not sample_data_df.empty:
             common_cols: List[str] = list(
-                set(common_df.columns.to_list()) & set(soil_data_df.columns.to_list())
+                set(common_df.columns.to_list()) & set(sample_data_df.columns.to_list())
             )
             if unique_field in common_cols:
                 common_cols.remove(unique_field)
 
             common_df = common_df.drop(columns=common_cols)
-            df = pd.merge(soil_data_df, common_df, on=unique_field)
+            df = pd.merge(sample_data_df, common_df, on=unique_field)
         else:
             raise ValueError(
                 f"The submission metadata record: {self.metadata_submission_id} is empty."
+            )
+
+        if "lat_lon" in df.columns:
+            df[["latitude", "longitude"]] = df["lat_lon"].str.split(" ", expand=True)
+
+        if "depth" in df.columns:
+            df[["minimum_depth", "maximum_depth"]] = df["depth"].str.split(
+                " - ", expand=True
+            )
+
+        if "geo_loc_name" in df.columns:
+            df["country_name"] = df["geo_loc_name"].str.split(":").str[0]
+
+        if "collection_date" in df.columns:
+            df["collection_year"] = df["collection_date"].str.split("-").str[0]
+            df["collection_month"] = df["collection_date"].str.split("-").str[1]
+            df["collection_day"] = df["collection_date"].str.split("-").str[2]
+
+            df["collection_month_name"] = df["collection_month"].apply(
+                lambda x: calendar.month_name[int(x)]
             )
 
         return df
@@ -228,6 +269,11 @@ def cli(
     :param output: Path to the output XLSX file.
     """
     load_dotenv()
+    env_path = os.path.join(os.path.dirname(__file__), ".env")
+    env_vars = dotenv_values(env_path)
+    for key, value in env_vars.items():
+        os.environ[key] = value
+
     metadata_retriever = MetadataRetriever(submission, user_facility)
     metadata_df = metadata_retriever.retrieve_metadata_records(unique_field)
 

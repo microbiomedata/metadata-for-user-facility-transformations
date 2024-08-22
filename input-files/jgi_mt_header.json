@@ -74,15 +74,15 @@
     },
     "Collection Year*": {
         "1": "Year in which the sample was collected. ",
-        "sub_port_mapping": "collection_date"
+        "sub_port_mapping": "collection_year"
     },
     "Collection Month*": {
         "1": "Month in which the sample was collected. Use the full name of the month.",
-        "sub_port_mapping": "collection_date"
+        "sub_port_mapping": "collection_month_name"
     },
     "Collection Day*": {
         "1": "Day on which the sample was collected.",
-        "sub_port_mapping": "collection_date"
+        "sub_port_mapping": "collection_day"
     },
     "Sample Isolated From*": {
         "1": "Describe where the sample originated.",
@@ -93,18 +93,19 @@
     },
     "Latitude*": {
         "1": "Latitude of sample collection. Value must be numeric only and between -90 and 90.",
-        "sub_port_mapping": "lat_lon"
+        "sub_port_mapping": "latitude"
     },
     "Longitude*": {
         "1": "Longitude of sample collection. Value must be numeric only and between -180 and 180.",
-        "sub_port_mapping": "lat_lon"
+        "sub_port_mapping": "longitude"
     },
     "Depth* (in meters) or minimum depth if a range": {
         "1": "Depth below the surface. If the sample was collected from a range of depths, indicate the shallowest depth. Value must be numeric and 0 or greater.",
-        "sub_port_mapping": "depth"
+        "sub_port_mapping": "minimum_depth"
     },
     "Maximum depth (in meters) if a range": {
-        "1": "If the sample was collected from a range of depths, indicate the maximum depth below the surface. Value must be numeric and >0."
+        "1": "If the sample was collected from a range of depths, indicate the maximum depth below the surface. Value must be numeric and >0.",
+        "sub_port_mapping": "maximum_depth"
     },
     "Elevation* (in meters) or minimum elevation if a range": {
         "1": "Elevation (from sea level) of sample collection. If the sample was collected from a range of elevations, indicate the elevation nearest to sea level.Value must be numeric and can be either positive or negative. ",
@@ -115,7 +116,7 @@
     },
     "Country*": {
         "1": "Country or ocean where the sample was collected.",
-        "sub_port_mapping": "geo_loc_name"
+        "sub_port_mapping": "country_name"
     },
     "Seq Project PI Name (No edit)": {
         "1": "Prefilled",
