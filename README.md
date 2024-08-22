@@ -71,5 +71,5 @@ poetry run python etl.py --submission {UUID of the target submission} --unique_f
 ```
 - Example- EMSL
 ```
-poetry run python etl.py --submission {UUID of the target submission} --unique_field samp_name --user-facility emsl --mapper input-files/emsl_header.json --output file-name_emsl.xlsx 
+poetry run python etl.py --submission {UUID of the target submission} --user-facility emsl --mapper input-files/emsl_header.json --header --unique-field samp_name --output file-name_emsl.xlsx
 ```
