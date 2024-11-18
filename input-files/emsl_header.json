@@ -69,7 +69,7 @@
         "1": "Total amount of sample sent to EMSL, include units",
         "2": "{value}{text}",
         "header": "shipped_sample_size",
-        "sub_port_mapping": "shipped_sample_size"
+        "sub_port_mapping": "sample_shipped"
     },
     "Collection Date": {
         "1": "The date of sampling, either as an instance (single point) or interval.",
