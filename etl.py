@@ -67,6 +67,7 @@ class MetadataRetriever:
             headers=headers,
         ).json()
 
+
         # Get user-facility key data
         common_df: pd.DataFrame = pd.DataFrame()
         if self.user_facility in self.USER_FACILITY_DICT:
@@ -82,7 +83,7 @@ class MetadataRetriever:
             )
         else: 
             df = common_df
-        
+
         # Find non-user-facility keys (ie, plant_associated, water, etc)
         all_keys_data = response["metadata_submission"]["sampleData"]
         user_facility_keys = ["emsl_data", "jgi_mg_data", "jgi_mt_data"]
@@ -99,16 +100,25 @@ class MetadataRetriever:
             if not sample_data_df.empty: 
                 df = pd.merge(df, sample_data_df, on="samp_name", how="left")
 
+
         # Begin collecting detailed sample data
+                
         if "lat_lon" in df.columns:
             df[["latitude", "longitude"]] = df["lat_lon"].str.split(" ", expand=True)
 
         if "depth" in df.columns:
-            df[["minimum_depth", "maximum_depth"]] = df["depth"].str.split(
-                # TODO: FIX DEPTH DELIMITER 
-                "-", expand=True
-            )
-
+            # Case - different delimiters used
+            df["depth"] = df["depth"].str.replace("-", " - ")
+            # Case - only one value provided for depth (single value will be max and min)
+            dfNew = df['depth'].str.split(" - ", expand=True)
+            if dfNew.shape[0] == 1: 
+                df[["minimum_depth"]] = dfNew[0]
+                df[["maximum_depth"]] = dfNew[0]
+            else: 
+                df[["minimum_depth", "maximum_depth"]] = df["depth"].str.split(
+                    " - ", expand=True
+                )
+            
         if "geo_loc_name" in df.columns:
             df["country_name"] = df["geo_loc_name"].str.split(":").str[0]
 
