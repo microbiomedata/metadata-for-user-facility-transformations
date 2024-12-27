@@ -44,11 +44,11 @@
     },
     "Tube or Plate Label*": {
         "1": "Must be unique across all tubes and plates, and <20 characters. All samples in a plate should have the same plate label.",
-        "sub_port_mapping": "dna_cont_type"
+        "sub_port_mapping": "dna_container_id"
     },
     "Sample Container*": {
         "1": "tube or plate (96-well)",
-        "sub_port_mapping": "dna_container_id"
+        "sub_port_mapping": "dna_cont_type"
     },
     "Plate location (well #)* required if samples provided in a plate": {
         "1": "Corner wells must be blank. For partial plates, fill by columns. Leave blank if the sample will be shipped in a tube.",
