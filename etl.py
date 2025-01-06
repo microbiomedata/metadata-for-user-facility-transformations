@@ -67,22 +67,7 @@ class MetadataRetriever:
             headers=headers,
         ).json()
 
-        sample_data_key = next(
-            iter(response["metadata_submission"]["sampleData"]), None
-        )
-        if sample_data_key:
-            sample_data: List[Dict[str, Any]] = response["metadata_submission"][
-                "sampleData"
-            ][sample_data_key]
-            sample_data_df: pd.DataFrame = pd.DataFrame(sample_data)
-        else:
-            sample_data_df = pd.DataFrame()
-
-        for column in sample_data_df.columns:
-            sample_data_df[column] = sample_data_df[column].apply(
-                lambda x: "; ".join(x) if isinstance(x, list) else x
-            )
-
+        # Get user-facility key data
         common_df: pd.DataFrame = pd.DataFrame()
         if self.user_facility in self.USER_FACILITY_DICT:
             user_facility_data: Dict[str, Any] = response["metadata_submission"][
@@ -90,31 +75,49 @@ class MetadataRetriever:
             ].get(self.USER_FACILITY_DICT[self.user_facility], {})
             common_df = pd.DataFrame(user_facility_data)
 
-        if sample_data_df.empty and not common_df.empty:
-            df = common_df
-        elif common_df.empty and not sample_data_df.empty:
-            df = sample_data_df
-        elif not common_df.empty and not sample_data_df.empty:
-            common_cols: List[str] = list(
-                set(common_df.columns.to_list()) & set(sample_data_df.columns.to_list())
-            )
-            if unique_field in common_cols:
-                common_cols.remove(unique_field)
-
-            common_df = common_df.drop(columns=common_cols)
-            df = pd.merge(sample_data_df, common_df, on=unique_field)
-        else:
+        # Check if common_df is empty
+        if common_df.empty:
             raise ValueError(
-                f"The submission metadata record: {self.metadata_submission_id} is empty."
+                f"No key {self.user_facility} exists in submission metadata record {self.metadata_submission_id}"
             )
+        else:
+            df = common_df
+
+        # Find non-user-facility keys (ie, plant_associated, water, etc)
+        all_keys_data = response["metadata_submission"]["sampleData"]
+        user_facility_keys = ["emsl_data", "jgi_mg_data", "jgi_mt_data"]
+        sample_data_keys = [
+            key for key in all_keys_data if key not in user_facility_keys
+        ]
+
+        # Loop through resulting keys and combine with common_df by samp_name
+        for key in sample_data_keys:
+
+            sample_data: Dict[str, Any] = response["metadata_submission"][
+                "sampleData"
+            ].get(key, {})
+            sample_data_df = pd.DataFrame(sample_data)
+
+            if not sample_data_df.empty:
+                df = pd.merge(df, sample_data_df, on="samp_name", how="left")
+
+        # Begin collecting detailed sample data
 
         if "lat_lon" in df.columns:
             df[["latitude", "longitude"]] = df["lat_lon"].str.split(" ", expand=True)
 
         if "depth" in df.columns:
-            df[["minimum_depth", "maximum_depth"]] = df["depth"].str.split(
-                " - ", expand=True
-            )
+            # Case - different delimiters used
+            df["depth"] = df["depth"].str.replace("-", " - ")
+            # Case - only one value provided for depth (single value will be max and min)
+            dfNew = df["depth"].str.split(" - ", expand=True)
+            if dfNew.shape[0] == 1:
+                df[["minimum_depth"]] = dfNew[0]
+                df[["maximum_depth"]] = dfNew[0]
+            else:
+                df[["minimum_depth", "maximum_depth"]] = df["depth"].str.split(
+                    " - ", expand=True
+                )
 
         if "geo_loc_name" in df.columns:
             df["country_name"] = df["geo_loc_name"].str.split(":").str[0]
