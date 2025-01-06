@@ -127,9 +127,14 @@ class MetadataRetriever:
             df["collection_month"] = df["collection_date"].str.split("-").str[1]
             df["collection_day"] = df["collection_date"].str.split("-").str[2]
 
-            df["collection_month_name"] = df["collection_month"].apply(
-                lambda x: calendar.month_name[int(x)]
-            )
+            # Safely map collection_month to month_name (account for NaN values)
+            def get_month_name(month):
+                try:
+                    return calendar.month_name[int(month)]
+                except (ValueError, TypeError):
+                    return "" # return empty string for invalid cases
+
+            df["collection_month_name"] = df["collection_month"].apply(get_month_name)
 
         return df
 
