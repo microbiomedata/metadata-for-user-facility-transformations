@@ -101,6 +101,9 @@ class MetadataRetriever:
             if not sample_data_df.empty:
                 df = pd.merge(df, sample_data_df, on="samp_name", how="left")
 
+            # Append the non-UF key name into the df for 'Sample Isolated From' col in jgi mg/mt
+            df['sample_isolated_from'] = key
+
         # Begin collecting detailed sample data
 
         if "lat_lon" in df.columns:
