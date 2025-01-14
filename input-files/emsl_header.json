@@ -69,7 +69,7 @@
         "1": "Total amount of sample sent to EMSL, include units",
         "2": "{value}{text}",
         "header": "shipped_sample_size",
-        "sub_port_mapping": "shipped_sample_size"
+        "sub_port_mapping": "sample_shipped"
     },
     "Collection Date": {
         "1": "The date of sampling, either as an instance (single point) or interval.",
@@ -81,7 +81,7 @@
         "1": "Detail how your sample was stored",
         "2": "{YYYY-MM-DD}",
         "header": "storage_condt",
-        "sub_port_mapping": "storage_condt"
+        "sub_port_mapping": "store_cond"
     },
     "Other Storage Condition": {
         "1": "Please specify if \"other\"",
@@ -93,7 +93,7 @@
         "1": "Details what temperature samples should be stored at",
         "2": "enumeration",
         "header": "samp_store_temp",
-        "sub_port_mapping": "samp_store_temp"
+        "sub_port_mapping": "emsl_store_temp"
     },
     "Other Storage temperature": {
         "1": "Please specify if \"other\"",
@@ -123,13 +123,13 @@
         "1": "A brief description of any processing applied to the sample during or after retrieving the sample from environment, or a link to the relevant protocol(s) performed.",
         "2": "{text}|{termLabel} {[termID]}",
         "header": "sample_processing",
-        "sub_port_mapping": "sample_processing"
+        "sub_port_mapping": "samp_mat_process"
     },
     "sample collection method": {
         "1": "The method employed for collecting the sample. This can be a citation or description",
         "2": "{PMID}|{DOI}|{URL}|{text}",
         "header": "sample_collection_method",
-        "sub_port_mapping": "sample_collection_method"
+        "sub_port_mapping": "samp_collec_method"
     },
     "depth": {
         "1": "The vertical distance below local surface. For sediment or soil samples depth is measured from sediment or soil surface, respectively. Depth can be reported as an interval for subsurface samples.",
@@ -141,7 +141,7 @@
         "1": "The device used to collect an environmental sample. Include dimensions of device if applicable",
         "2": "{text} {dimensions}",
         "header": "sample_collection_dev",
-        "sub_port_mapping": "sample_collection_dev"
+        "sub_port_mapping": "samp_collec_device"
     },
     "Sieve Size": {
         "1": "Collection design of pooled samples and/or sieve size and amount of sample sieved",
