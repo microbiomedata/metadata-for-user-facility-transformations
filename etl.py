@@ -134,6 +134,15 @@ class MetadataRetriever:
                 lambda x: calendar.month_name[int(x)]
             )
 
+        # Address 'Was sample DNAse treated?' col 
+        # Change from 'yes/no' to 'Y/N'
+        if self.user_facility == 'jgi_mg':
+            df.loc[df["dna_dnase"] == "yes", "dna_dnase"] = 'Y'
+            df.loc[df["dna_dnase"] == "no", "dna_dnase"] = 'N'
+        if self.user_facility == 'jgi_mt':
+            df.loc[df["dnase_rna"] == "yes", "dnase_rna"] = 'Y'
+            df.loc[df["dnase_rna"] == "no", "dnase_rna"] = 'N'
+
         return df
 
 
