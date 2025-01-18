@@ -73,7 +73,7 @@ Options:
 
 - Example - JGI/JGI_MG
 ```
-poetry run python etl.py --submission {UUID of the target submission} --unique_field samp_name --user-facility jgi_mg --mapper input-files/jgi_mg_header.json --output file-name_jgi.xlsx
+poetry run python etl.py --submission {UUID of the target submission} --unique-field samp_name --user-facility jgi_mg --mapper input-files/jgi_mg_header.json --output file-name_jgi.xlsx
 ```
 
 - Example - EMSL
