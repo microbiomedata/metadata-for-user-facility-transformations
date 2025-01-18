@@ -86,10 +86,11 @@
     },
     "Sample Isolated From*": {
         "1": "Describe where the sample originated.",
-        "sub_port_mapping": "specific_ecosystem"
+        "sub_port_mapping": "sample_isolated_from"
     },
     "Collection Site or Growth Conditions* (required for RNA samples)": {
-        "1": "Provide information on the specific tissue type or growth conditions. "
+        "1": "Provide information on the specific tissue type or growth conditions. ",
+        "sub_port_mapping": "env_medium"
     },
     "Latitude*": {
         "1": "Latitude of sample collection. Value must be numeric only and between -90 and 90.",

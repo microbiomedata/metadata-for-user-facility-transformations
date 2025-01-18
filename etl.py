@@ -101,6 +101,9 @@ class MetadataRetriever:
             if not sample_data_df.empty:
                 df = pd.merge(df, sample_data_df, on="samp_name", how="left")
 
+            # Append the non-UF key name into the df for 'Sample Isolated From' col in jgi mg/mt
+            df['sample_isolated_from'] = key
+
         # Begin collecting detailed sample data
 
         if "lat_lon" in df.columns:
@@ -135,6 +138,15 @@ class MetadataRetriever:
                     return "" # return empty string for invalid cases
 
             df["collection_month_name"] = df["collection_month"].apply(get_month_name)
+
+        # Address 'Was sample DNAse treated?' col
+        # Change from 'yes/no' to 'Y/N'
+        if self.user_facility == 'jgi_mg':
+            df.loc[df["dna_dnase"] == "yes", "dna_dnase"] = 'Y'
+            df.loc[df["dna_dnase"] == "no", "dna_dnase"] = 'N'
+        if self.user_facility == 'jgi_mt':
+            df.loc[df["dnase_rna"] == "yes", "dnase_rna"] = 'Y'
+            df.loc[df["dnase_rna"] == "no", "dnase_rna"] = 'N'
 
         return df
 
